@@ -10,7 +10,7 @@ Python's built-in `list`, `dict`, and `deque` are thread-safe for some operation
 
 ## Why use these collections?
 
-**_There is a lot of confusion on whether Python collections are thread-safe or not_**<sup>1, 2, 3</sup>. Spoiler: they aren't, despite what many people believe.
+**_There is a lot of confusion on whether Python collections are thread-safe or not_**<sup>1, 2, 3</sup>.
 
 The bottom line is that Python's built-in collections are **not fully thread-safe** for all operations. While some simple operations (like `list.append()` or `dict[key] = value`) are thread-safe due to the Global Interpreter Lock (GIL), **compound operations and iteration with mutation are not**. This can lead to subtle bugs, race conditions, or even crashes in multi-threaded programs.
 
