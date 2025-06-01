@@ -1,7 +1,6 @@
 # Python Concurrent (thread-safe) collections
 
-Tests status:  
-![Run all tests](https://github.com/alelom/python-concurrentCollections/actions/workflows/python-package.yml/badge.svg)
+![Run all tests](https://github.com/alelom/python-concurrentCollections/actions/workflows/run-all-tests.yml/badge.svg)
 
 ## tl;dr
 
