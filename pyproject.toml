@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "concurrent-collections"
+name = "concurrent_collections"
 version = "1.0.0"
 description = "A brief description of concurrent-collections"
 authors = [{ name = "Alessio Lombardi", email = "work@alelom.com" }]
@@ -13,5 +13,4 @@ requires-python = ">=3.6"
 dependencies = []
 
 [tool.setuptools]
-packages = [{ include = "concurrent-collections" }]
-package-dir = { "" = "src" }
+packages = ["concurrent_collections"]

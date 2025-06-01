@@ -1,6 +1,6 @@
 import threading
 import time
-from concurrent_dict import ConcurrentDictionary
+from concurrent_collections import ConcurrentDictionary
 
 
 def test_concurrentdictionary_update_thread_safe():

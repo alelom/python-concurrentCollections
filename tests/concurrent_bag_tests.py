@@ -1,6 +1,6 @@
 import threading
 import time
-from concurrent_bag import ConcurrentBag
+from concurrent_collections import ConcurrentBag
 
 def test_concurrent_bag_thread_safety():
     bag = ConcurrentBag()

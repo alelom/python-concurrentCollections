@@ -1,12 +1,9 @@
 import threading
 import time
 import pytest
-from concurrent_deque import ConcurrentQueue
+from concurrent_collections import ConcurrentQueue
 from collections import deque
-
 import threading
-import time
-from concurrent_deque import ConcurrentQueue
 
 
 def test_concurrentqueue_thread_safe_append_pop():
