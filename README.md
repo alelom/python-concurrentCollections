@@ -38,13 +38,13 @@ Suggestions and feedbacks are welcome.
 Pip:
 
 ```bash
-pip install python-nameof
+pip install concurrent_collections
 ```
 
 My recommendation is to always use [`uv`](https://docs.astral.sh/uv/) instead of pip – I personally think it's the best package and environment manager for Python.
 
 ```bash
-uv add python-nameof
+uv add concurrent_collections
 ```
 
 ## Collections
