@@ -2,6 +2,9 @@
 
 Thread-safe Python collections: `ConcurrentBag`, `ConcurrentDictionary`, and `ConcurrentQueue`.
 
+Inspired from the amazing [C#'s concurrent collections](https://learn.microsoft.com/en-us/dotnet/api/system.collections.concurrent?view=net-9.0).
+
+
 ## tl;dr
 
 Python's built-in `list`, `dict`, and `deque` are thread-safe for some operations, but not all. 
