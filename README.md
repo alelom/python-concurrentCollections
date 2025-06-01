@@ -1,7 +1,7 @@
 # Python Concurrent (thread-safe) collections
 ## tl;dr
 
-Python's built-in `list`, `dict`, and `deque` are thread-safe for some operations, but not all. 
+Despite what many people think, Python's built-in `list`, `dict`, and `deque` are thread-safe for [_some operations_, but not all](https://docs.python.org/3/faq/library.html#what-kinds-of-global-value-mutation-are-thread-safe). This created a lot of confusion in the Python community.
 
 `concurrent_collections` provides thread-safe alternatives by using locks internally to ensure safe concurrent access and mutation from multiple threads.
 
