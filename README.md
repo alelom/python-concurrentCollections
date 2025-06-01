@@ -1,33 +1,77 @@
-# My Python Package
+# concurrent_collections
+
+Thread-safe Python collections: `ConcurrentBag`, `ConcurrentDictionary`, and `ConcurrentQueue`.
 
 ## Overview
 
-My Python Package is a Python library designed to provide essential functionalities for [briefly describe the purpose of your package]. It aims to [describe the goals or features of the package].
+Python's built-in `list`, `dict`, and `deque` are thread safe for some operations, but not all. 
+
+`concurrent_collections` provides thread-safe alternatives by using locks internally to ensure safe concurrent access and mutation from multiple threads.
+
+## Why use these collections?
+
+Python's built-in collections are **not fully thread-safe** for all operations. While some simple operations (like `list.append()` or `dict[key] = value`) are thread-safe due to the Global Interpreter Lock (GIL), **compound operations and iteration with mutation are not**. This can lead to subtle bugs, race conditions, or even crashes in multi-threaded programs.
+
+See the [Python FAQ: "What kinds of global value mutation are thread-safe?"](https://docs.python.org/3/faq/library.html#what-kinds-of-global-value-mutation-are-thread-safe) for details. The FAQ explains that only a handful of simple operations are guaranteed to be atomic and thread-safe. For anything more complex, you must use your own locking or a thread-safe collection.
+
+`concurrent_collections` provides drop-in replacements that handle locking for you, making concurrent programming safer and easier.
 
 ## Installation
 
-You can install the package using pip:
+Pip:
 
+```bash
+pip install python-nameof
 ```
-pip install my_python_package
+
+My recommendation is to always use [`uv`](https://docs.astral.sh/uv/) instead of pip – I personally think it's the best package and environment manager for Python.
+
+```bash
+uv add python-nameof
 ```
 
-## Usage
+## Collections
 
-Here is a simple example of how to use My Python Package:
+### ConcurrentBag
+
+A thread-safe, list-like collection.
 
 ```python
-from my_python_package import core
+from concurrent_collections import ConcurrentBag
 
-# Example usage of core functionality
-result = core.some_function()
-print(result)
+bag = ConcurrentBag([1, 2, 3])
+bag.append(4)
+print(list(bag))  # [1, 2, 3, 4]
 ```
 
-## Contributing
+### ConcurrentDictionary
 
-Contributions are welcome! Please feel free to submit a pull request or open an issue for any suggestions or improvements.
+A thread-safe dictionary. For atomic compound updates, use `update_atomic`.
+
+```python
+from concurrent_collections import ConcurrentDictionary
+
+d = ConcurrentDictionary({'x': 1})
+d['y'] = 2  # Simple assignment is thread-safe
+# For atomic updates:
+d.update_atomic('x', lambda v: v + 1)
+print(d['x'])  # 2
+```
+
+### ConcurrentQueue
+
+A thread-safe double-ended queue.
+
+```python
+from concurrent_collections import ConcurrentQueue
+
+q = ConcurrentQueue()
+q.append(1)
+q.appendleft(0)
+print(q.pop())      # 1
+print(q.popleft())  # 0
+```
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License
