@@ -1,4 +1,8 @@
 # Python Concurrent (thread-safe) collections
+
+Tests status:  
+![Run all tests](https://github.com/alelom/python-concurrentCollections/actions/workflows/python-package.yml/badge.svg)
+
 ## tl;dr
 
 Despite what many people think, Python's built-in `list`, `dict`, and `deque` are thread-safe for [_some operations_, but not all](https://docs.python.org/3/faq/library.html#what-kinds-of-global-value-mutation-are-thread-safe). This created a lot of confusion in the Python community.
