@@ -1,4 +1,4 @@
-# concurrent_collections
+# Python Concurrent (thread-safe) collections
 
 Thread-safe Python collections: `ConcurrentBag`, `ConcurrentDictionary`, and `ConcurrentQueue`.
 
