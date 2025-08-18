@@ -72,12 +72,12 @@ class ConcurrentDictionary(Generic[K, V]):
                 self._dict[key] = func(None) # type: ignore
 
 
-    def pop(self, key: K, default: Optional[V] = None) -> V:
+    def pop(self, key: K, default: Optional[V] = None) -> Optional[V]:
         with self._lock:
             return self._dict.pop(key, default)
 
 
-    def popitem(self) -> tuple:
+    def popitem(self) -> tuple[K, V]:
         with self._lock:
             return self._dict.popitem()
 
