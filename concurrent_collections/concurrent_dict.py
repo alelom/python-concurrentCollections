@@ -20,8 +20,7 @@ class ConcurrentDictionary(Generic[K, V]):
     """
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._lock = threading.RLock()
-        self._dict: Dict[Any, Any] = dict(*args, **kwargs)
-
+        self._dict: Dict[K, V] = dict(*args, **kwargs)  # type: ignore
 
     def __getitem__(self, key: K) -> V:
         with self._lock:
@@ -98,7 +97,7 @@ class ConcurrentDictionary(Generic[K, V]):
             return list(self._dict.values())
 
 
-    def items(self) -> List[tuple]:
+    def items(self) -> List[Tuple]:
         with self._lock:
             return list(self._dict.items())
 
