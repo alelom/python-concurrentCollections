@@ -1,5 +1,5 @@
 import threading
-from typing import Any, Callable, Dict, Iterator, List, Optional, TypeVar, Generic
+from typing import Any, Callable, Dict, Iterator, List, Optional, TypeVar, Generic, Tuple
 import warnings
 import sys
 
@@ -45,7 +45,7 @@ class ConcurrentDictionary(Generic[K, V]):
             return self._dict.get(key, default)
 
 
-    def setdefault(self, key: K, default: Optional[V] = None) -> V:
+    def setdefault(self, key: K, default: V) -> V:
         with self._lock:
             return self._dict.setdefault(key, default)
 
@@ -97,7 +97,7 @@ class ConcurrentDictionary(Generic[K, V]):
             return list(self._dict.values())
 
 
-    def items(self) -> List[Tuple]:
+    def items(self) -> List[Tuple[K, V]]:
         with self._lock:
             return list(self._dict.items())
 
