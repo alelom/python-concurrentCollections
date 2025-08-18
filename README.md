@@ -17,7 +17,8 @@ Inspired from the amazing [C#'s concurrent collections](https://learn.microsoft.
 
 **_There is a lot of confusion on whether Python collections are thread-safe or not_**<sup>1, 2, 3</sup>.
 
-The bottom line is that Python's built-in collections are **not fully thread-safe** for all operations. While some simple operations (like `list.append()` or `dict[key] = value`) are thread-safe due to the Global Interpreter Lock (GIL), **compound operations and iteration with mutation are not**. This can lead to subtle bugs, race conditions, or even crashes in multi-threaded programs.
+The bottom line is that Python's built-in collections are **not fully thread-safe** for all operations.  
+While some simple operations (like `list.append()` or `dict[key] = value`) are thread-safe due to the Global Interpreter Lock (GIL), **compound operations and iteration with mutation are not**. This can lead to subtle bugs, race conditions, or even crashes in multi-threaded programs.
 
 See the [Python FAQ: "What kinds of global value mutation are thread-safe?"](https://docs.python.org/3/faq/library.html#what-kinds-of-global-value-mutation-are-thread-safe) for details. The FAQ explains that only some (if common) operations are guaranteed to be atomic and thread-safe, but for anything more complex, you must use your own locking.  
 The docs even go as far as to say:
@@ -26,7 +27,9 @@ The docs even go as far as to say:
 
 Which is telling.
 
-`concurrent_collections` provides drop-in replacements that handle locking for you, making concurrent programming safer and easier.  
+Even [Google recommends to not rely on atomicity of built-in collections](https://github.com/google/styleguide/blob/91d6e367e384b0d8aaaf7ce95029514fcdf38651/pyguide.md#218-threading).
+
+This **`concurrent_collections`** library provides drop-in replacements that handle locking for you.  
 Suggestions and feedbacks are welcome.
 
 <sub>
