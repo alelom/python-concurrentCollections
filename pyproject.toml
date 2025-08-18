@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "concurrent_collections"
-version = "1.1.0"
+version = "1.2.0"
 description = "A brief description of concurrent-collections"
 authors = [{ name = "Alessio Lombardi", email = "work@alelom.com" }]
 license = { file = "MIT" }
