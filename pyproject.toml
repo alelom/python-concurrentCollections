@@ -10,7 +10,9 @@ authors = [{ name = "Alessio Lombardi", email = "work@alelom.com" }]
 license = { file = "MIT" }
 readme = "README.md"
 requires-python = ">=3.6"
-dependencies = []
+dependencies = [
+    "pytest>=7.0.1",
+]
 
 [tool.setuptools]
 packages = ["concurrent_collections"]

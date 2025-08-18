@@ -6,16 +6,18 @@ if True:
 import threading
 import time
 from concurrent_collections import ConcurrentDictionary
+import pytest
 
 
 def test_concurrentdictionary_update_thread_safe():
-    D = ConcurrentDictionary({'x': 0})
+    dic : ConcurrentDictionary[str, int] = ConcurrentDictionary()
+    dic["x"] = 0
     def worker():
         for _ in range(10000):
-            old = D['x']
+            old = dic['x']
             time.sleep(0.00001)
             # D.__setitem__('x', old + 1)
-            D.update_atomic("x", lambda v: v + 1)
+            dic.update_atomic("x", lambda v: v + 1)
 
     threads = [threading.Thread(target=worker) for _ in range(8)]
     for t in threads:
@@ -24,12 +26,12 @@ def test_concurrentdictionary_update_thread_safe():
         t.join()
 
     # The expected value is 8 * 10000 = 80000
-    assert D['x'] == 80000, f"ConcurrentDictionary should be thread-safe, got {D['x']}"
+    assert dic['x'] == 80000, f"ConcurrentDictionary should be thread-safe, got {dic['x']}"
 
 
 def test_concurrentdictionary_setdefault_thread_safe():
-    D = ConcurrentDictionary()
-    errors = []
+    D : ConcurrentDictionary[str,int] = ConcurrentDictionary()
+    errors : list[Exception] = []
 
     def worker():
         for _ in range(10000):
@@ -49,8 +51,8 @@ def test_concurrentdictionary_setdefault_thread_safe():
 
 
 def test_concurrentdictionary_pop_thread_safe():
-    D = ConcurrentDictionary({'x': 0})
-    errors = []
+    D : ConcurrentDictionary[str,int] = ConcurrentDictionary({'x': 0})
+    errors : list[Exception] = []
 
     def worker():
         for _ in range(1000):
@@ -71,8 +73,8 @@ def test_concurrentdictionary_pop_thread_safe():
 
 
 def test_concurrentdictionary_clear_thread_safe():
-    D = ConcurrentDictionary({i: i for i in range(100)})
-    errors = []
+    D : ConcurrentDictionary[str,int] = ConcurrentDictionary({i: i for i in range(100)})
+    errors : list[Exception] = []
 
     def worker():
         for _ in range(100):
@@ -90,23 +92,7 @@ def test_concurrentdictionary_clear_thread_safe():
 
     # No thread safety errors should occur
     assert not errors, f"Thread safety errors occurred: {errors}"
+      
     
-
 if __name__ == "__main__":
-    import types
-
-    # Collect all functions in globals() that start with 'test_' and are functions
-    test_functions = [
-        func for name, func in globals().items()
-        if name.startswith("test_") and isinstance(func, types.FunctionType)
-    ]
-    failed = 0
-    for func in test_functions:
-        try:
-            print(f"Running {func.__name__} ...")
-            func()
-        except Exception as e:
-            failed += 1
-            print(f"***\nFAILED: {func.__name__}: {e}\n***")
-
-    print(f"\n{len(test_functions) - failed} passed, {failed} failed.")
+    pytest.main([__file__])

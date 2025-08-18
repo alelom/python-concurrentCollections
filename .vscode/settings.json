@@ -1,0 +1,87 @@
+{
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./src",
+        "-p",
+        "test_*.py",
+        "*_test.py"
+    ],
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestArgs": [
+        "--rootdir", "${workspaceFolder}/src",
+        "--ignore-glob", "_SS*",
+        "--ignore-glob", "src/deployment/api/_shared_od*",
+        "--ignore-glob", "GUI",
+        "--cache-clear"
+    ],
+    "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.include": [
+        "./src/**",
+    ],
+    "python.analysis.exclude": [
+        "**/_SS**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.git/**",
+        "**/.hg/**",
+        "**/.svn/**",
+        "**/.vscode/**",
+        "**/.history/**",
+        "**/CVS/**",
+        "**/.cache/**",
+        "**/venv/**",
+        "**/.venv/**",
+        "**/env/**",
+        "**/.env/**",
+        "**/site-packages/**",
+    ],
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportUnusedImport": "information",
+        "reportUnusedVariable": "information",
+        "reportPrivateUsage": "warning",
+        "reportMissingTypeStubs": "information",
+        "reportConstantRedefinition": "information",
+        "reportMissingTypeArgument": "information",
+        "reportMissingParameterType": "warning",
+        "reportUnknownArgumentType": "warning",
+        "reportUnnecessaryCast": "warning",
+        "reportUnknownMemberType": "warning",
+        "reportUnknownVariableType": "warning",
+        "reportUnknownParameterType": "warning"
+    },
+    "python.analysis.extraPaths": [
+        "./src",
+        "./src/data",
+        "./src/deployment",
+        "./src/features",
+        "./src/models",
+        "./src/integration",
+        "./src/visualisation",
+    ],
+    "python.autoComplete.extraPaths": [
+        "./src",
+        "./src/data",
+        "./src/deployment",
+        "./src/features",
+        "./src/models",
+        "./src/integration",
+        "./src/visualisation",
+    ],
+    "search.followSymlinks": false,
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "**/*.drawio": true,
+        "**/_SS/**": true,
+        "**.venv/**": true,
+    },
+    "files.exclude": {
+        "**/.pytest_cache": true,
+        "**/.*": {
+        "when": "$(basename).isDirectory"
+        }
+    }
+}

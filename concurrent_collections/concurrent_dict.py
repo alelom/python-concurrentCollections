@@ -1,5 +1,5 @@
 import threading
-from typing import Any, Callable, Dict, Iterator, List, Optional, TypeVar
+from typing import Any, Callable, Dict, Iterator, List, Optional, TypeVar, Generic
 import warnings
 import sys
 
@@ -7,7 +7,7 @@ T = TypeVar('T')
 K = TypeVar('K')
 V = TypeVar('V')
 
-class ConcurrentDictionary:
+class ConcurrentDictionary(Generic[K, V]):
     """
     A thread-safe dictionary implementation using a re-entrant lock.
     All operations that mutate or access the dictionary are protected.
@@ -64,7 +64,13 @@ class ConcurrentDictionary:
             d.update_atomic('x', lambda v: v + 1)
         """
         with self._lock:
-            self._dict[key] = func(self._dict[key])
+            if key in self._dict:
+                old_value = self._dict[key]
+                new_value = func(old_value)
+                self._dict[key] = new_value
+            else:
+                # If the key does not exist, we can set it directly
+                self._dict[key] = func(None) # type: ignore
 
 
     def pop(self, key: K, default: Optional[V] = None) -> V:
