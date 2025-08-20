@@ -5,11 +5,13 @@ if True:
 
 import threading
 import time
+from typing import List
+import pytest
 from concurrent_collections import ConcurrentBag
 
 def test_concurrent_bag_thread_safety():
-    bag = ConcurrentBag()
-    errors = []
+    bag : ConcurrentBag[int] = ConcurrentBag()
+    errors : List[Exception] = []
 
     def add_items():
         try:
@@ -28,7 +30,7 @@ def test_concurrent_bag_thread_safety():
         except Exception as e:
             errors.append(e)
 
-    threads = []
+    threads : List[threading.Thread] = []
     for _ in range(5):
         t1 = threading.Thread(target=add_items)
         t2 = threading.Thread(target=remove_items)
@@ -44,7 +46,7 @@ def test_concurrent_bag_thread_safety():
 
 def test_concurrent_bag_iteration_safe():
     bag = ConcurrentBag(range(100))
-    errors = []
+    errors : List[Exception] = []
 
     def iterate():
         try:
@@ -73,7 +75,7 @@ def test_concurrent_bag_iteration_safe():
 
 def test_concurrent_bag_setitem_thread_safe():
     bag = ConcurrentBag([0, 1, 2, 3, 4])
-    errors = []
+    errors : List[Exception] = []
 
     def worker():
         for _ in range(10000):
@@ -94,7 +96,7 @@ def test_concurrent_bag_setitem_thread_safe():
 
 def test_concurrent_bag_append_last_element_thread_safe():
     bag = ConcurrentBag([0])
-    errors = []
+    errors : List[Exception] = []
 
     def worker():
         for _ in range(10000):
@@ -115,19 +117,4 @@ def test_concurrent_bag_append_last_element_thread_safe():
 
 
 if __name__ == "__main__":
-    import types
-
-    test_functions = [
-        func for name, func in globals().items()
-        if name.startswith("test_") and isinstance(func, types.FunctionType)
-    ]
-    failed = 0
-    for func in test_functions:
-        try:
-            print(f"Running {func.__name__} ...")
-            func()
-        except Exception as e:
-            failed += 1
-            print(f"***\nFAILED: {func.__name__}: {e}\n***")
-            
-    print(f"\n{len(test_functions) - failed} passed, {failed} failed.")
+    pytest.main([__file__])

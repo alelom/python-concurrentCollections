@@ -1,5 +1,5 @@
 import threading
-from typing import Generic, Iterable, Iterator, Optional, TypeVar
+from typing import Generic, Iterable, Iterator, List, Optional, TypeVar
 
 T = TypeVar('T')
 
@@ -10,7 +10,7 @@ class ConcurrentBag(Generic[T]):
     """
     def __init__(self, iterable: Optional[Iterable[T]] = None) -> None:
         self._lock: threading.RLock = threading.RLock()
-        self._items: list[T] = list(iterable) if iterable is not None else []
+        self._items: List[T] = list(iterable) if iterable is not None else []
 
     def append(self, item: T) -> None:
         with self._lock:

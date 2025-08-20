@@ -8,20 +8,28 @@ Requirement: `pip install build`
 
 ## Build from Windows
 
+If using UV:
+
+```cmd
+del dist\*.* /Q && uv run python -m build
+```
+or without UV:
+
 ```cmd
 del dist\*.* /Q && python -m build
 ```
 
-to delete any previous releases from the `dist` folder and then build.
+## Build on Linux
+If using UV:
 
-## Build from Linux
+```bash
+rm dist/*.* | uv run python3 -m build
+```
+or without UV:
 
 ```bash
 rm dist/*.* | python3 -m build
 ```
-
-to delete any previous releases from the `dist` folder and then build.
-
 
 ## Release on PyPI
 

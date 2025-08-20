@@ -1,21 +1,6 @@
 {
-    "python.testing.unittestArgs": [
-        "-v",
-        "-s",
-        "./src",
-        "-p",
-        "test_*.py",
-        "*_test.py"
-    ],
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestArgs": [
-        "--rootdir", "${workspaceFolder}/src",
-        "--ignore-glob", "_SS*",
-        "--ignore-glob", "src/deployment/api/_shared_od*",
-        "--ignore-glob", "GUI",
-        "--cache-clear"
-    ],
     "python.analysis.typeCheckingMode": "strict",
     "python.analysis.include": [
         "./src/**",

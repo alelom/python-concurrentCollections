@@ -5,6 +5,7 @@ if True:
 
 import threading
 import time
+from typing import List
 from concurrent_collections import ConcurrentDictionary
 import pytest
 
@@ -31,7 +32,7 @@ def test_concurrentdictionary_update_thread_safe():
 
 def test_concurrentdictionary_setdefault_thread_safe():
     D : ConcurrentDictionary[str,int] = ConcurrentDictionary()
-    errors : list[Exception] = []
+    errors : List[Exception] = []
 
     def worker():
         for _ in range(10000):
@@ -52,7 +53,7 @@ def test_concurrentdictionary_setdefault_thread_safe():
 
 def test_concurrentdictionary_pop_thread_safe():
     D : ConcurrentDictionary[str,int] = ConcurrentDictionary({'x': 0})
-    errors : list[Exception] = []
+    errors : List[Exception] = []
 
     def worker():
         for _ in range(1000):
@@ -74,7 +75,7 @@ def test_concurrentdictionary_pop_thread_safe():
 
 def test_concurrentdictionary_clear_thread_safe():
     D : ConcurrentDictionary[str,int] = ConcurrentDictionary({i: i for i in range(100)})
-    errors : list[Exception] = []
+    errors : List[Exception] = []
 
     def worker():
         for _ in range(100):

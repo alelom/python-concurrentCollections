@@ -3,6 +3,7 @@ if True:
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     os.environ["concurrent_collections_test"] = "True"
 
+from typing import List
 import pytest
 from collections import deque
 import threading
@@ -18,8 +19,8 @@ def test_deque_mutation_during_iteration_raises():
 
 
 def test_deque_not_fully_thread_safe_append_pop():
-    q = deque()
-    errors = []
+    q : deque[int] = deque()
+    errors : List[Exception] = []
 
     def append_items():
         try:
@@ -50,7 +51,7 @@ def test_deque_not_fully_thread_safe_append_pop():
 
 def test_deque_thread_unsafe_iteration_and_mutation():
     q = deque(range(100))
-    errors = []
+    errors : List[Exception] = []
 
     def iterate():
         try:
@@ -76,9 +77,6 @@ def test_deque_thread_unsafe_iteration_and_mutation():
 
     # If a RuntimeError occurs, it demonstrates lack of thread safety for iteration+mutation
     assert any(isinstance(e, RuntimeError) for e in errors)
-from collections import deque
-import threading
-
 
 
 def test_deque_mutation_during_iteration():
@@ -92,8 +90,8 @@ def test_deque_mutation_during_iteration():
 def test_deque_not_fully_thread_safe():
     # This test attempts to expose thread safety issues by having multiple threads
     # append and pop items concurrently.
-    q = deque()
-    errors = []
+    q :deque[int] = deque()
+    errors : List[Exception] = []
 
     def append_items():
         try:
@@ -110,7 +108,7 @@ def test_deque_not_fully_thread_safe():
         except Exception as e:
             errors.append(e)
 
-    threads = []
+    threads : List[threading.Thread]= []
     for _ in range(5):
         t1 = threading.Thread(target=append_items)
         t2 = threading.Thread(target=pop_items)
@@ -129,20 +127,4 @@ def test_deque_not_fully_thread_safe():
     
     
 if __name__ == "__main__":
-    import types
-
-    # Collect all functions in globals() that start with 'test_' and are functions
-    test_functions = [
-        func for name, func in globals().items()
-        if name.startswith("test_") and isinstance(func, types.FunctionType)
-    ]
-    failed = 0
-    for func in test_functions:
-        try:
-            print(f"Running {func.__name__} ...")
-            func()
-        except Exception as e:
-            failed += 1
-            print(f"***\nFAILED: {func.__name__}: {e}\n***")
-
-    print(f"\n{len(test_functions) - failed} passed, {failed} failed.")
+    pytest.main([__file__])

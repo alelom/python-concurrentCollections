@@ -5,6 +5,8 @@ if True:
 
 import threading
 import time
+from typing import Dict, List
+import pytest
 
 
 def test_dict_update_not_thread_safe():
@@ -27,8 +29,8 @@ def test_dict_update_not_thread_safe():
 
 
 def test_dict_setdefault_not_thread_safe():
-    D = {}
-    errors = []
+    D : Dict[str,int]= {}
+    errors : List[Exception] = []
 
     def worker():
         for _ in range(10000):
@@ -50,20 +52,4 @@ def test_dict_setdefault_not_thread_safe():
 
 
 if __name__ == "__main__":
-    import types
-
-    # Collect all functions in globals() that start with 'test_' and are functions
-    test_functions = [
-        func for name, func in globals().items()
-        if name.startswith("test_") and isinstance(func, types.FunctionType)
-    ]
-    failed = 0
-    for func in test_functions:
-        try:
-            print(f"Running {func.__name__} ...")
-            func()
-        except Exception as e:
-            failed += 1
-            print(f"***\nFAILED: {func.__name__}: {e}\n***")
-
-    print(f"\n{len(test_functions) - failed} passed, {failed} failed.")
+    pytest.main([__file__])

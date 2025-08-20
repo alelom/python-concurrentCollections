@@ -5,15 +5,15 @@ if True:
 
 import threading
 import time
+from typing import List
 import pytest
 from concurrent_collections import ConcurrentQueue
 from collections import deque
-import threading
 
 
 def test_concurrentqueue_thread_safe_append_pop():
-    q = ConcurrentQueue()
-    errors = []
+    q : ConcurrentQueue[int] = ConcurrentQueue()
+    errors : List[Exception] = []
 
     def append_items():
         try:
@@ -32,7 +32,7 @@ def test_concurrentqueue_thread_safe_append_pop():
         except Exception as e:
             errors.append(e)
 
-    threads = []
+    threads : List[threading.Thread] = []
     for _ in range(5):
         t1 = threading.Thread(target=append_items)
         t2 = threading.Thread(target=pop_items)
@@ -49,7 +49,7 @@ def test_concurrentqueue_thread_safe_append_pop():
 
 def test_concurrentqueue_thread_safe_iteration_and_mutation():
     q = ConcurrentQueue(range(100))
-    errors = []
+    errors : List[Exception] = []
 
     def iterate():
         try:
@@ -78,8 +78,8 @@ def test_concurrentqueue_thread_safe_iteration_and_mutation():
 
 
 def test_concurrentqueue_thread_safe_appendleft_popleft():
-    q = ConcurrentQueue()
-    errors = []
+    q : ConcurrentQueue[int] = ConcurrentQueue()
+    errors : List[Exception] = []
 
     def appendleft_items():
         try:
@@ -98,7 +98,7 @@ def test_concurrentqueue_thread_safe_appendleft_popleft():
         except Exception as e:
             errors.append(e)
 
-    threads = []
+    threads : List[threading.Thread] = []
     for _ in range(5):
         t1 = threading.Thread(target=appendleft_items)
         t2 = threading.Thread(target=popleft_items)
@@ -131,3 +131,7 @@ if __name__ == "__main__":
             print(f"***\nFAILED: {func.__name__}: {e}\n***")
 
     print(f"\n{len(test_functions) - failed} passed, {failed} failed.")
+    
+    
+if __name__ == "__main__":
+    pytest.main([__file__])
