@@ -29,10 +29,11 @@ class ConcurrentDictionary(Generic[K, V]):
     def __setitem__(self, key: K, value: V) -> None:
         warnings.warn(
             f"Direct assignment (D[key] = value) is discouraged. "
-            f"Use update_atomic for thread-safe compound updates.",
+            f"Use assign_atomic() for assigning a value to a new key safely, "
+            f"or update_atomic() for thread-safe update of an existing dictionary key.",
             stacklevel=2
         )
-        self.update_atomic(key, lambda _: value)
+        self.assign_atomic(key, value)
 
 
     def __delitem__(self, key: K) -> None:
@@ -50,9 +51,19 @@ class ConcurrentDictionary(Generic[K, V]):
             return self._dict.setdefault(key, default)
 
 
+    def assign_atomic(self, key: K, value: V) -> None:
+        """
+        Atomically assign a value to a key.
+
+        This method ensures that the assignment is performed atomically,
+        preventing
+        """
+        self.update_atomic(key, lambda _: value)
+        
+    
     def update_atomic(self, key: K, func: Callable[[V], V]) -> None:
         """
-        Atomically update the value for a key using func(old_value) -> new_value.
+        Atomically modify the value for a key using func(old_value) -> new_value.
 
         This method ensures that the read-modify-write sequence is performed atomically,
         preventing race conditions in concurrent environments.
@@ -60,7 +71,7 @@ class ConcurrentDictionary(Generic[K, V]):
         Example:
             d = ConcurrentDictionary({'x': 0})
             # Atomically increment the value for 'x'
-            d.update_atomic('x', lambda v: v + 1)
+            d.modify_atomic('x', lambda v: v + 1)
         """
         with self._lock:
             if key in self._dict:

@@ -12,22 +12,24 @@ import pytest
 
 def test_concurrentdictionary_update_thread_safe():
     dic : ConcurrentDictionary[str, int] = ConcurrentDictionary()
-    dic["x"] = 0
+    update_actions : int = 10000
+    dic.assign_atomic("x", 0)
     def worker():
-        for _ in range(10000):
-            old = dic['x']
+        for _ in range(update_actions):
             time.sleep(0.00001)
             # D.__setitem__('x', old + 1)
             dic.update_atomic("x", lambda v: v + 1)
 
-    threads = [threading.Thread(target=worker) for _ in range(8)]
+    threads_num : int = 8
+    threads = [threading.Thread(target=worker) for _ in range(threads_num)]
     for t in threads:
         t.start()
     for t in threads:
         t.join()
 
     # The expected value is 8 * 10000 = 80000
-    assert dic['x'] == 80000, f"ConcurrentDictionary should be thread-safe, got {dic['x']}"
+    expected_value = threads_num * update_actions
+    assert dic['x'] == expected_value, f"ConcurrentDictionary should be thread-safe and with a value of {expected_value} for the `x` key, got {dic['x']}"
 
 
 def test_concurrentdictionary_setdefault_thread_safe():
