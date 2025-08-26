@@ -29,20 +29,20 @@ class ConcurrentDictionary(Generic[K, V]):
             return self._key_locks[key]
 
     class _KeyLockContext:
-        def __init__(self, outer : "ConcurrentDictionary[K,V]", key: K, default_value: V | None):
+        def __init__(self, outer : "ConcurrentDictionary[K,V]", key: K, default_value: Optional[V]):
             self._outer = outer
             self._key = key
             self._lock = outer._get_key_lock(key)
             self._default_value = default_value
 
-        def __enter__(self) -> V | None:
+        def __enter__(self) -> Optional[V]:
             self._lock.acquire()
             return self._outer._dict.get(self._key, self._default_value)
 
         def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any):
             self._lock.release()
 
-    def get_locked(self, key: K, default_value : V | None = None) -> ContextManager[V | None]:
+    def get_locked(self, key: K, default_value : Optional[V] = None) -> ContextManager[Optional[V]]:
         """
         Context manager: lock the key, yield its value, unlock on exit.
 
