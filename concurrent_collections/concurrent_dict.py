@@ -1,7 +1,6 @@
 import threading
-from typing import Any, Callable, Dict, Iterator, List, Optional, TypeVar, Generic, Tuple
+from typing import Any, Callable, Dict, Iterator, List, Optional, TypeVar, Generic, Tuple, ContextManager
 import warnings
-import sys
 
 T = TypeVar('T')
 K = TypeVar('K')
@@ -21,6 +20,47 @@ class ConcurrentDictionary(Generic[K, V]):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._lock = threading.RLock()
         self._dict: Dict[K, V] = dict(*args, **kwargs)  # type: ignore
+        self._key_locks: Dict[K, threading.RLock] = {}
+
+    def _get_key_lock(self, key: K) -> threading.RLock:
+        with self._lock:
+            if key not in self._key_locks:
+                self._key_locks[key] = threading.RLock()
+            return self._key_locks[key]
+
+    class _KeyLockContext:
+        def __init__(self, outer : "ConcurrentDictionary[K,V]", key: K):
+            self._outer = outer
+            self._key = key
+            self._lock = outer._get_key_lock(key)
+
+        def __enter__(self) -> V:
+            self._lock.acquire()
+            return self._outer._dict[self._key]
+
+        def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any):
+            self._lock.release()
+
+    def get_locked(self, key: K) -> ContextManager[V]:
+        """
+        Context manager: lock the key, yield its value, unlock on exit.
+
+        Usage:
+            with d.get_locked('x') as value:
+                # safely read/update value for 'x'
+        """
+        return self._KeyLockContext(self, key)
+
+    def key_lock(self, key: K):
+        """
+        Context manager: lock the key, yield nothing, unlock on exit.
+
+        Usage:
+            with d.key_lock('x'):
+                # safely update d['x'] or perform multiple operations
+        """
+        lock = self._get_key_lock(key)
+        return lock
 
     def __getitem__(self, key: K) -> V:
         with self._lock:

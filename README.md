@@ -72,16 +72,41 @@ print(list(bag))  # [1, 2, 3, 4]
 
 ### ConcurrentDictionary
 
-A thread-safe dictionary. For atomic compound updates, use `update_atomic`.
+A thread-safe dictionary. It has a few notable methods:
+
+- assign_atomic()
+- get_locked()
+- update_atomic()
+
+#### ConcurrentDictionary's `assign_atomic()`
+
+Assigns a dictionary value under a key in a thread-safe way.
+While `dict["somekey"] = value` is allowed, it's best to use `assign_atomic()` for clarity of intent. Using normal assignment will work but raise a UserWarning.
+
+
+#### ConcurrentDictionary's `get_locked()`
+
+When working with `ConcurrentDictionary`, you should use the `get_locked` method to safely read or update the value for a specific key in a multi-threaded environment. This ensures that only one thread can access or modify the value for a given key at a time, preventing race conditions.
 
 ```python
 from concurrent_collections import ConcurrentDictionary
 
-d = ConcurrentDictionary({'x': 1})
-d['y'] = 2  # Simple assignment is thread-safe
-# For atomic updates:
-d.update_atomic('x', lambda v: v + 1)
-print(d['x'])  # 2
+d = ConcurrentDictionary({'x': "some value" })
+
+# Safely read and update the value for 'x'
+with d.get_locked('x') as value:
+    # value is locked for this thread
+    d['x'] = "new value"
+```
+
+#### ConcurrentDictionary's `update_atomic()`
+
+Performs a thread-safe, in-place update to an existing value under a key.
+
+```python
+
+d = ConcurrentDictionary({'x': 1 })
+d.update_atomic("x", lambda v: v + 1) # d now contains 2 under the 'x' key.
 ```
 
 ### ConcurrentQueue

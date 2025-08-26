@@ -95,7 +95,87 @@ def test_concurrentdictionary_clear_thread_safe():
 
     # No thread safety errors should occur
     assert not errors, f"Thread safety errors occurred: {errors}"
-      
+    
+def test_get_locked_context_manager_returns_value_and_locks():
+    d: ConcurrentDictionary[str, int] = ConcurrentDictionary({'a': 1})
+    with d.get_locked('a') as value:
+        assert value == 1
+        # Update inside lock
+        d['a'] = value + 1
+        assert d['a'] == 2
+
+def test_get_locked_raises_keyerror_for_missing_key():
+    d: ConcurrentDictionary[str, int] = ConcurrentDictionary()
+    try:
+        with d.get_locked('missing'):
+            assert False, "Should raise KeyError for missing key"
+    except KeyError:
+        pass
+
+def test_key_lock_context_manager_locks_and_unlocks():
+    d: ConcurrentDictionary[str, int] = ConcurrentDictionary({'b': 10})
+    lock = d.key_lock('b')
+    # Should be a context manager (RLock)
+    assert hasattr(lock, '__enter__') and hasattr(lock, '__exit__')
+    with lock:
+        d['b'] = 20
+        assert d['b'] == 20
+
+def test_get_locked_allows_nested_access():
+    d: ConcurrentDictionary[str, int] = ConcurrentDictionary({'c': 5})
+    with d.get_locked('c') as value:
+        assert value == 5
+        # Nested get_locked should not deadlock
+        with d.get_locked('c') as value2:
+            assert value2 == 5
+
+def test_get_locked_thread_safety():
+    d: ConcurrentDictionary[str, int] = ConcurrentDictionary({'x': 0})
+    errors : List[Exception] = []
+
+    def worker():
+        try:
+            for _ in range(1000):
+                with d.get_locked('x') as v:
+                    d['x'] = v + 1
+        except Exception as e:
+            errors.append(e)
+
+    threads = [threading.Thread(target=worker) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert not errors, f"Thread safety errors occurred: {errors}"
+    assert d['x'] == 4000
+
+def test_modify_without_get_locked_causes_race_condition():
+    """
+    Demonstrates that modifying a value at a key without using get_locked
+    can result in a race condition and incorrect result.
+    """
+    d: ConcurrentDictionary[str, int] = ConcurrentDictionary({'x': 0})
+
+    def worker():
+        # Not using get_locked or any locking
+        for _ in range(1000):
+            v = d['x']  # Read without lock
+            # Simulate context switch
+            time.sleep(0.000001)
+            d['x'] = v + 1  # Write without lock
+
+    threads = [threading.Thread(target=worker) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    # The correct value should be 4000, but due to race conditions, it will likely be less
+    assert d['x'] != 4000, (
+        "Modifying without get_locked should result in incorrect value due to race conditions, "
+        f"but got {d['x']}"
+    )
     
 if __name__ == "__main__":
     pytest.main([__file__])
