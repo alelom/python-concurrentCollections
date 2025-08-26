@@ -96,20 +96,27 @@ def test_concurrentdictionary_clear_thread_safe():
     # No thread safety errors should occur
     assert not errors, f"Thread safety errors occurred: {errors}"
     
+def test_get_locked_context_manager_empty_value():
+    d: ConcurrentDictionary[str, int] = ConcurrentDictionary({})
+    with d.get_locked('a') as value:
+        assert not value
+    
 def test_get_locked_context_manager_returns_value_and_locks():
     d: ConcurrentDictionary[str, int] = ConcurrentDictionary({'a': 1})
+    
     with d.get_locked('a') as value:
         assert value == 1
         # Update inside lock
         d['a'] = value + 1
         assert d['a'] == 2
 
-def test_get_locked_raises_keyerror_for_missing_key():
+def test_get_locked_default_value():
     d: ConcurrentDictionary[str, int] = ConcurrentDictionary()
     try:
-        with d.get_locked('missing'):
-            assert False, "Should raise KeyError for missing key"
+        with d.get_locked('missing', 3) as value:
+            assert value == 3, f"Expected default value 3, got {value}"
     except KeyError:
+        pass
         pass
 
 def test_key_lock_context_manager_locks_and_unlocks():
