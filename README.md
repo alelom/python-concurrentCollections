@@ -74,9 +74,9 @@ print(list(bag))  # [1, 2, 3, 4]
 
 A thread-safe dictionary. It has a few notable methods:
 
-- assign_atomic()
-- get_locked()
-- update_atomic()
+- `assign_atomic()`
+- `get_locked()`
+- `update_atomic()`
 
 #### ConcurrentDictionary's `assign_atomic()`
 
