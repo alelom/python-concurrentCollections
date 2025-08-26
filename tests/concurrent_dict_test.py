@@ -144,6 +144,7 @@ def test_get_locked_thread_safety():
         try:
             for _ in range(1000):
                 with d.get_locked('x') as v:
+                    assert v is not None
                     d['x'] = v + 1
         except Exception as e:
             errors.append(e)
