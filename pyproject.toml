@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "concurrent_collections"
-version = "2.0.5"
+version = "2.0.6"
 description = "A brief description of concurrent-collections"
 authors = [{ name = "Alessio Lombardi", email = "work@alelom.com" }]
 license = { file = "MIT" }
@@ -12,7 +12,7 @@ readme = "README.md"
 requires-python = ">=3.6"
 dependencies = [
 ]
-urls = { "Homepage" = "https://github.com/alombardi/python-concurrentCollections" }
+urls = { "Homepage" = "https://github.com/alelom/python-concurrentCollections" }
 
 [tool.setuptools]
 packages = ["concurrent_collections"]
