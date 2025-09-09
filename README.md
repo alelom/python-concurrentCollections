@@ -110,18 +110,18 @@ d.update_atomic("x", lambda v: v + 1) # d now contains 2 under the 'x' key.
 ```
 
 ### ConcurrentQueue
+For thread-safe queues, Python offers already a lot of alternatives, even too many, so I'm not going to add another. Please refer to the following:
+In the [`queue`](https://docs.python.org/3/library/queue.html) module: 
+- `queue`,
+- `LifoQueue`,
+- `PriorityQueue`
+- `SimpleQueue`. 
 
-A thread-safe double-ended queue.
+Note these queue collections are thread-safe, although it isn't explicitly clear from their type name, making it **dangerously confusing** for people mistaking the same property to apply to e.g. [`deque`](https://docs.python.org/3/library/collections.html#collections.deque), which is absolutely **not** thread-safe.
 
-```python
-from concurrent_collections import ConcurrentQueue
+Additionally, there are [other queues classes in the `multiprocessing` module](https://docs.python.org/3/library/multiprocessing.html#pipes-and-queues), which makes it even more confusing due to the redundancy with the above queue classes.
 
-q = ConcurrentQueue()
-q.append(1)
-q.appendleft(0)
-print(q.pop())      # 1
-print(q.popleft())  # 0
-```
+
 
 ## License
 
