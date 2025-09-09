@@ -120,7 +120,10 @@ In the [`queue`](https://docs.python.org/3/library/queue.html) module, there are
 
 :warning: Note these queue collections are thread-safe, although _it isn't explicitly clear from their type name_, making it **dangerously confusing** for people mistakenly thinking that thread-safety applies also to e.g. the [`deque`](https://docs.python.org/3/library/collections.html#collections.deque), which is absolutely **not** thread-safe.
 
-Additionally, there are [other queue classes in the `multiprocessing` module](https://docs.python.org/3/library/multiprocessing.html#pipes-and-queues), which makes it even more confusing due to the redundancy with the above queue classes.
+Additionally, there are [other queue classes in the `multiprocessing` module](https://docs.python.org/3/library/multiprocessing.html#pipes-and-queues), which makes it even more confusing due to the redundancy with the above queue classes. This defines:
+- `JoinableQueue`
+- `Queue` (again)
+- `SimpleQueue` (again)
 
 
 ## License
