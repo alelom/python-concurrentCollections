@@ -113,6 +113,7 @@ d.update_atomic("x", lambda v: v + 1) # d now contains 2 under the 'x' key.
 For thread-safe queues, Python offers already a lot of alternatives, even too many, so I'm not going to add another. Please refer to the following.
 
 In the [`queue`](https://docs.python.org/3/library/queue.html) module, there are the following thread-safe queue classes:
+- `Queue`
 - `SimpleQueue`
 - `LifoQueue`,
 - `PriorityQueue`
