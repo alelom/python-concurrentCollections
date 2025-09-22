@@ -112,7 +112,7 @@ class ConcurrentDictionary(Generic[K, V]):
         Example:
             d = ConcurrentDictionary({'x': 0})
             # Atomically increment the value for 'x'
-            d.modify_atomic('x', lambda v: v + 1)
+            d.update_atomic('x', lambda v: v + 1)
         """
         with self._lock:
             if key in self._dict:
@@ -123,6 +123,103 @@ class ConcurrentDictionary(Generic[K, V]):
                 # If the key does not exist, we can set it directly
                 self._dict[key] = func(None) # type: ignore
 
+    def remove_atomic(self, key: K) -> Optional[V]:
+        """
+        Atomically remove a key from the dictionary and return its value.
+        
+        This method ensures that the removal is performed atomically,
+        preventing race conditions in concurrent environments.
+        
+        Returns the value associated with the key, or None if the key doesn't exist.
+        
+        Example:
+            d = ConcurrentDictionary({'x': 1, 'y': 2})
+            value = d.remove_atomic('x')  # Returns 1, removes 'x'
+        """
+        with self._lock:
+            return self._dict.pop(key, None)
+
+    def remove_if_exists(self, key: K) -> bool:
+        """
+        Atomically remove a key from the dictionary if it exists.
+        
+        Returns True if the key was removed, False if it didn't exist.
+        
+        Example:
+            d = ConcurrentDictionary({'x': 1})
+            removed = d.remove_if_exists('x')  # Returns True
+            removed = d.remove_if_exists('y')  # Returns False
+        """
+        with self._lock:
+            if key in self._dict:
+                del self._dict[key]
+                return True
+            return False
+
+    def get_and_remove(self, key: K, default: Optional[V] = None) -> Optional[V]:
+        """
+        Atomically get the value for a key and remove it from the dictionary.
+        
+        This is equivalent to pop(key, default) but with a more descriptive name
+        for atomic operations.
+        
+        Example:
+            d = ConcurrentDictionary({'x': 1})
+            value = d.get_and_remove('x')  # Returns 1, removes 'x'
+        """
+        return self.pop(key, default)
+
+    def put_if_absent(self, key: K, value: V) -> Optional[V]:
+        """
+        Atomically put a value for a key only if the key is not already present.
+        
+        Returns the existing value if the key exists, None if the key was added.
+        
+        Example:
+            d = ConcurrentDictionary({'x': 1})
+            existing = d.put_if_absent('x', 2)  # Returns 1, no change
+            existing = d.put_if_absent('y', 3)  # Returns None, adds 'y': 3
+        """
+        with self._lock:
+            if key in self._dict:
+                return self._dict[key]
+            else:
+                self._dict[key] = value
+                return None
+
+    def replace_if_present(self, key: K, value: V) -> bool:
+        """
+        Atomically replace the value for a key only if the key exists.
+        
+        Returns True if the key was replaced, False if the key doesn't exist.
+        
+        Example:
+            d = ConcurrentDictionary({'x': 1})
+            replaced = d.replace_if_present('x', 2)  # Returns True
+            replaced = d.replace_if_present('y', 3)  # Returns False
+        """
+        with self._lock:
+            if key in self._dict:
+                self._dict[key] = value
+                return True
+            return False
+
+    def replace_if_equal(self, key: K, old_value: V, new_value: V) -> bool:
+        """
+        Atomically replace the value for a key only if the current value equals old_value.
+        
+        Returns True if the value was replaced, False otherwise.
+        
+        Example:
+            d = ConcurrentDictionary({'x': 1})
+            replaced = d.replace_if_equal('x', 1, 2)  # Returns True
+            replaced = d.replace_if_equal('x', 1, 3)  # Returns False (current value is 2)
+        """
+        with self._lock:
+            if key in self._dict and self._dict[key] == old_value:
+                self._dict[key] = new_value
+                return True
+            return False
 
     def pop(self, key: K, default: Optional[V] = None) -> Optional[V]:
         with self._lock:
@@ -172,3 +269,28 @@ class ConcurrentDictionary(Generic[K, V]):
     def __repr__(self) -> str:
         with self._lock:
             return f"ConcurrentDictionary({self._dict!r})"
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Thread-safe equality comparison.
+        
+        Two ConcurrentDictionary instances are equal if they have the same key-value pairs.
+        """
+        if not isinstance(other, ConcurrentDictionary):
+            return False
+        
+        with self._lock:
+            with other._lock:
+                return self._dict == other._dict
+
+    def __hash__(self) -> int:
+        """
+        Thread-safe hash computation.
+        
+        The hash is computed based on the current state of the dictionary.
+        Note: The hash will change if the dictionary is modified.
+        """
+        with self._lock:
+            # Convert to frozenset of items for consistent hashing
+            items = frozenset(self._dict.items())
+            return hash(items)

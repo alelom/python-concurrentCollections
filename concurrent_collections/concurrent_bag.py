@@ -1,5 +1,5 @@
 import threading
-from typing import Generic, Iterable, Iterator, List, Optional, TypeVar
+from typing import Generic, Iterable, Iterator, List, Optional, TypeVar, Any
 
 T = TypeVar('T')
 
@@ -55,3 +55,37 @@ class ConcurrentBag(Generic[T]):
     def __repr__(self) -> str:
         with self._lock:
             return f"ConcurrentBag({self._items!r})"
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Thread-safe equality comparison.
+        
+        Two ConcurrentBag instances are equal if they have the same elements with the same frequency
+        (multiset equality). Order does not matter for bag equality.
+        
+        Example:
+            ConcurrentBag([1, 2, 2, 3]) == ConcurrentBag([2, 1, 3, 2])  # True
+            ConcurrentBag([1, 2, 2, 3]) == ConcurrentBag([1, 2, 3, 3])  # False (different frequencies)
+        """
+        if not isinstance(other, ConcurrentBag):
+            return False
+        
+        with self._lock:
+            with other._lock:
+                # Compare as multisets by counting element frequencies
+                from collections import Counter
+                return Counter(self._items) == Counter(other._items)
+
+    def __hash__(self) -> int:
+        """
+        Thread-safe hash computation.
+        
+        The hash is computed based on the multiset content (element frequencies).
+        Note: The hash will change if the bag is modified.
+        """
+        with self._lock:
+            # Convert to frozenset of (element, count) pairs for consistent hashing
+            from collections import Counter
+            counter = Counter(self._items)
+            items = frozenset(counter.items())
+            return hash(items)

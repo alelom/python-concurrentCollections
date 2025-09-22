@@ -68,5 +68,6 @@
         "**/.*": {
         "when": "$(basename).isDirectory"
         }
-    }
+    },
+    "python.languageServer": "None"
 }

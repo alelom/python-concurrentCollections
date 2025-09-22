@@ -1,6 +1,6 @@
 import threading
 from collections import deque
-from typing import Generic, Iterable, Iterator, Optional, TypeVar
+from typing import Generic, Iterable, Iterator, Optional, TypeVar, Any
 
 T = TypeVar('T')
 
@@ -49,3 +49,36 @@ class ConcurrentQueue(Generic[T]):
     def __repr__(self) -> str:
         with self._lock:
             return f"ConcurrentQueue({list(self._deque)})"
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Thread-safe equality comparison.
+        
+        Two ConcurrentQueue instances are equal if they have the same elements in the same order.
+        For concurrent operations, this comparison takes a snapshot of both queues at the time
+        of comparison to ensure consistency.
+        
+        Note: Due to the concurrent nature of the queue, the order may change between
+        comparisons, but this method provides a consistent snapshot-based comparison.
+        """
+        if not isinstance(other, ConcurrentQueue):
+            return False
+        
+        with self._lock:
+            with other._lock:
+                # Take snapshots for consistent comparison
+                self_snapshot = list(self._deque)
+                other_snapshot = list(other._deque)
+                return self_snapshot == other_snapshot
+
+    def __hash__(self) -> int:
+        """
+        Thread-safe hash computation.
+        
+        The hash is computed based on the current state of the queue.
+        Note: The hash will change if the queue is modified.
+        """
+        with self._lock:
+            # Convert to tuple for consistent hashing
+            items = tuple(self._deque)
+            return hash(items)

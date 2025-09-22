@@ -72,17 +72,69 @@ print(list(bag))  # [1, 2, 3, 4]
 
 ### ConcurrentDictionary
 
-A thread-safe dictionary. It has a few notable methods:
+A thread-safe dictionary. It has several atomic methods for safe concurrent operations:
 
-- `assign_atomic()`
-- `get_locked()`
-- `update_atomic()`
+- `assign_atomic()` - Atomically assign a value to a key
+- `update_atomic()` - Atomically update a value using a function
+- `remove_atomic()` - Atomically remove a key and return its value
+- `put_if_absent()` - Atomically put a value only if the key doesn't exist
+- `replace_if_present()` - Atomically replace a value only if the key exists
+- `replace_if_equal()` - Atomically replace a value only if it equals the expected value
+- `remove_if_exists()` - Atomically remove a key if it exists
+- `get_and_remove()` - Atomically get and remove a value
+- `get_locked()` - Context manager for safe read-modify-write operations
 
 #### ConcurrentDictionary's `assign_atomic()`
 
 Assigns a dictionary value under a key in a thread-safe way.
 While `dict["somekey"] = value` is allowed, it's best to use `assign_atomic()` for clarity of intent. Using normal assignment will work but raise a UserWarning.
 
+#### ConcurrentDictionary's `remove_atomic()`
+
+Atomically removes a key from the dictionary and returns its value, or None if the key doesn't exist.
+
+```python
+from concurrent_collections import ConcurrentDictionary
+
+d = ConcurrentDictionary({'x': 1, 'y': 2})
+value = d.remove_atomic('x')  # Returns 1, removes 'x'
+```
+
+#### ConcurrentDictionary's `put_if_absent()`
+
+Atomically puts a value for a key only if the key is not already present. Returns the existing value if the key exists, None if the key was added.
+
+```python
+from concurrent_collections import ConcurrentDictionary
+
+d = ConcurrentDictionary({'x': 1})
+existing = d.put_if_absent('x', 2)  # Returns 1, no change
+existing = d.put_if_absent('y', 3)  # Returns None, adds 'y': 3
+```
+
+#### ConcurrentDictionary's `replace_if_present()`
+
+Atomically replaces the value for a key only if the key exists. Returns True if the key was replaced, False if the key doesn't exist.
+
+```python
+from concurrent_collections import ConcurrentDictionary
+
+d = ConcurrentDictionary({'x': 1})
+replaced = d.replace_if_present('x', 2)  # Returns True
+replaced = d.replace_if_present('y', 3)  # Returns False
+```
+
+#### ConcurrentDictionary's `replace_if_equal()`
+
+Atomically replaces the value for a key only if the current value equals the expected value. Returns True if the value was replaced, False otherwise.
+
+```python
+from concurrent_collections import ConcurrentDictionary
+
+d = ConcurrentDictionary({'x': 1})
+replaced = d.replace_if_equal('x', 1, 2)  # Returns True
+replaced = d.replace_if_equal('x', 1, 3)  # Returns False (current value is 2)
+```
 
 #### ConcurrentDictionary's `get_locked()`
 
@@ -125,6 +177,70 @@ Additionally, there are [other queue classes in the `multiprocessing` module](ht
 - `Queue` (again)
 - `SimpleQueue` (again)
 
+
+## Equality and Identity Semantics
+
+### ConcurrentBag Equality
+
+`ConcurrentBag` compares as a **multiset** - order doesn't matter, but element frequency does:
+
+```python
+from concurrent_collections import ConcurrentBag
+
+# These are equal (same elements, same frequencies)
+bag1 = ConcurrentBag([1, 2, 2, 3])
+bag2 = ConcurrentBag([2, 1, 3, 2])
+assert bag1 == bag2  # True
+
+# These are not equal (different frequencies)
+bag3 = ConcurrentBag([1, 2, 3, 3])
+assert bag1 != bag3  # True
+```
+
+### ConcurrentQueue Equality
+
+`ConcurrentQueue` compares elements in order, taking snapshots for consistency during concurrent operations:
+
+```python
+from concurrent_collections import ConcurrentQueue
+
+# These are equal (same elements, same order)
+queue1 = ConcurrentQueue([1, 2, 3])
+queue2 = ConcurrentQueue([1, 2, 3])
+assert queue1 == queue2  # True
+
+# These are not equal (different order)
+queue3 = ConcurrentQueue([3, 2, 1])
+assert queue1 != queue3  # True
+```
+
+### ConcurrentDictionary Equality
+
+`ConcurrentDictionary` compares key-value pairs, order doesn't matter:
+
+```python
+from concurrent_collections import ConcurrentDictionary
+
+# These are equal (same key-value pairs)
+dict1 = ConcurrentDictionary({'a': 1, 'b': 2})
+dict2 = ConcurrentDictionary({'b': 2, 'a': 1})
+assert dict1 == dict2  # True
+
+# These are not equal (different values)
+dict3 = ConcurrentDictionary({'a': 1, 'b': 3})
+assert dict1 != dict3  # True
+```
+
+## Thread Safety Guarantees
+
+All collections provide the following guarantees:
+
+1. **Atomic Operations**: All individual operations (append, remove, get, set) are atomic
+2. **Consistent Snapshots**: Iteration and equality comparisons take consistent snapshots
+3. **No Race Conditions**: Multiple threads can safely access and modify the collections
+4. **Identity Consistency**: Hash values and equality comparisons are consistent within a single operation
+
+**Note**: While individual operations are thread-safe, compound operations (like checking length then conditionally modifying) should use the provided atomic methods or context managers to ensure consistency.
 
 ## License
 
